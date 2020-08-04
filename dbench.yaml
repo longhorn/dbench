@@ -3,17 +3,13 @@ apiVersion: v1
 metadata:
   name: dbench-pv-claim
 spec:
-  storageClassName: ssd
-  # storageClassName: gp2
-  # storageClassName: local-storage
-  # storageClassName: ibmc-block-bronze
-  # storageClassName: ibmc-block-silver
-  # storageClassName: ibmc-block-gold
+  storageClassName: longhorn
+  volumeMode: Block
   accessModes:
     - ReadWriteOnce
   resources:
     requests:
-      storage: 1000Gi
+      storage: 2Gi
 ---
 apiVersion: batch/v1
 kind: Job
@@ -24,22 +20,27 @@ spec:
     spec:
       containers:
       - name: dbench
-        image: logdna/dbench:latest
+        image: longhorn/dbench:latest
+        #image: boknowswiki/dbench:longhorn
         imagePullPolicy: Always
+        securityContext:
+          # Need this for fio be able to invalid the cache
+          privileged: true
+        #command: ["/bin/sh", "-c", "while true; do :; done"]
         env:
-          - name: DBENCH_MOUNTPOINT
-            value: /data
+          #- name: DBENCH_MOUNTPOINT
+          #  value: /data
           # - name: DBENCH_QUICK
           #   value: "yes"
-          # - name: FIO_SIZE
-          #   value: 1G
+          - name: FIO_SIZE
+            value: 1G
           # - name: FIO_OFFSET_INCREMENT
           #   value: 256M
           # - name: FIO_DIRECT
           #   value: "0"
-        volumeMounts:
-        - name: dbench-pv
-          mountPath: /data
+        #volumeMounts:
+        #- name: dbench-pv
+        #  mountPath: /data
       restartPolicy: Never
       volumes:
       - name: dbench-pv
