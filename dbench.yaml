@@ -20,13 +20,11 @@ spec:
     spec:
       containers:
       - name: dbench
-        image: longhorn/dbench:latest
-        #image: boknowswiki/dbench:longhorn
+        image: longhornio/dbench:latest
         imagePullPolicy: Always
         securityContext:
           # Need this for fio be able to invalid the cache
           privileged: true
-        #command: ["/bin/sh", "-c", "while true; do :; done"]
         env:
           #- name: DBENCH_MOUNTPOINT
           #  value: /data
